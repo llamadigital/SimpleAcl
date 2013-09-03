@@ -4,6 +4,8 @@ namespace SimpleAcl\Role;
 use SimpleAcl\Role;
 use SimpleAcl\Role\RoleAggregateInterface;
 use SimpleAcl\Object\ObjectAggregate;
+use SimpleAcl\RuleResultCollection;
+use SimpleAcl\Strategy\AggregateStrategyFirstWins;
 
 /**
  * Holds roles.
@@ -13,6 +15,25 @@ use SimpleAcl\Object\ObjectAggregate;
  */
 class RoleAggregate extends ObjectAggregate implements RoleAggregateInterface
 {
+
+    public function setStrategy($strategy)
+    {
+      parent::setStrategy($strategy);
+    }
+
+    public function newRuleResultCollection()
+    {
+      $rule_result_collection = new RuleResultCollection();
+      $rule_result_collection->setStrategy($this->strategy);
+
+      return $rule_result_collection;
+    }
+
+    public function __construct()
+    {
+      $this->strategy = new AggregateStrategyFirstWins();
+    }
+
     /**
      * Add role.
      *

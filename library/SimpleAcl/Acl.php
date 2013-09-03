@@ -207,7 +207,8 @@ class Acl
      */
     public function isAllowed($roleName, $resourceName, $ruleName)
     {
-        return $this->isAllowedReturnResult($roleName, $resourceName, $ruleName)->get();
+        $result_set = $this->isAllowedReturnResult($roleName, $resourceName, $ruleName);
+        return $result_set->get();
     }
 
     /**
@@ -221,7 +222,7 @@ class Acl
      */
     public function isAllowedReturnResult($roleAggregate, $resourceAggregate, $ruleName)
     {
-        $ruleResultCollection = new RuleResultCollection();
+        $ruleResultCollection = $this->getRuleResultCollection($roleAggregate);
 
         $roles = $this->getNames($roleAggregate);
         $resources = $this->getNames($resourceAggregate);
@@ -230,6 +231,17 @@ class Acl
             foreach ($resources as $resourceName) {
                 $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection, $roleAggregate, $resourceAggregate);
             }
+        }
+
+        return $ruleResultCollection;
+    }
+
+    private function getRuleResultCollection($roleAggregate)
+    {
+        $ruleResultCollection = new RuleResultCollection();
+
+        if ( $roleAggregate instanceof RoleAggregateInterface ) {
+            $ruleResultCollection = $roleAggregate->newRuleResultCollection();
         }
 
         return $ruleResultCollection;

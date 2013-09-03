@@ -13,6 +13,7 @@ abstract class ObjectAggregate
      * @var Object[]
      */
     protected $objects = array();
+    protected $strategy = null;
 
     /**
      * @param Object $object
@@ -23,6 +24,11 @@ abstract class ObjectAggregate
             return;
         }
         $this->objects[] = $object;
+    }
+
+    protected function setStrategy($strategy)
+    {
+      $this->strategy = $strategy;
     }
 
     protected function removeObjects()

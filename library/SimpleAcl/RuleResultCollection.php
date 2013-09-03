@@ -4,6 +4,7 @@ namespace SimpleAcl;
 use SimpleAcl\RuleResult;
 use SimpleAcl\SplPriorityQueue;
 use IteratorAggregate;
+use SimpleAcl\Strategy\AggregateStrategyFirstWins;
 
 /**
  * Holds RuleResult sorted according priority.
@@ -15,15 +16,22 @@ class RuleResultCollection implements IteratorAggregate
      * @var SplPriorityQueue
      */
     public $collection;
+    public $strategy = null;
 
     public function __construct()
     {
         $this->collection = new SplPriorityQueue();
+        $this->strategy = new AggregateStrategyFirstWins();
     }
 
     public function getIterator()
     {
         return clone $this->collection;
+    }
+
+    public function setStrategy($strategy)
+    {
+        $this->strategy = $strategy;
     }
 
     /**
@@ -51,10 +59,9 @@ class RuleResultCollection implements IteratorAggregate
             return false;
         }
 
-        /** @var RuleResult $result  */
-        $result = $this->collection->top();
+        $result = $this->strategy->getResultAction($this->collection);
 
-        return $result->getAction();
+        return $result;
     }
 
     /**
