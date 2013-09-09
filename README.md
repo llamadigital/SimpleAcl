@@ -156,7 +156,7 @@ var_dump($acl->isAllowed($all, 'SiteFrontend', 'View')); // true
 ##### Using Aggregation Strategies
 You can set a different strategy to handle role aggregations in varied ways. The
 RoleAggregate defaults to a FirstWins strategy. A DenyWins strategy is also
-provided.
+provided. To implement additional strategies inherit from AggregateStrategy.
 
 ```php
 $acl = new Acl();
