@@ -153,4 +153,35 @@ $acl->addRule($user, $siteFrontend, 'View', function (SimpleAcl\RuleResult $rule
 var_dump($acl->isAllowed($all, 'SiteFrontend', 'View')); // true
 ```
 
+##### Using Aggregation Strategies
+You can set a different strategy to handle role aggregations in varied ways. The
+RoleAggregate defaults to a FirstWins strategy. A DenyWins strategy is also
+provided.
+
+```php
+$acl = new Acl();
+
+$user = new Role('User');
+$admin = new Role('Admin');
+
+$strategy = new AggregateStrategyDenyWins();
+
+$all = new RoleAggregate();
+$all->setStrategy($strategy);
+$all->addRole($user);
+$all->addRole($admin);
+
+$siteFrontend = new Resource('SiteFrontend');
+$siteBackend = new Resource('SiteBackend');
+
+$acl->addRule($user, $siteFrontend, 'View', true);
+$acl->addRule($admin, $siteFrontend, 'View', true);
+
+$acl->addRule($user, $siteBackend, 'View', false);
+$acl->addRule($admin, $siteBackend, 'View', true);
+
+$this->assertTrue($acl->isAllowed($all, 'SiteFrontend', 'View'));
+$this->assertFalse($acl->isAllowed($all, 'SiteBackend', 'View'));
+```
+
 __For more help check out wiki pages.__
