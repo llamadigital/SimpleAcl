@@ -1,13 +1,18 @@
 {
-    "name": "alexshelkov/simpleacl",
+    "name": "llamadigital/simpleacl",
     "type": "library",
     "description": "Simple Access Control List (ACL) for PHP.",
     "keywords": ["ACL", "authorization", "permission"],
-    "homepage": "https://github.com/alexshelkov/SimpleAcl",
+    "homepage": "https://github.com/llamadigital/SimpleAcl",
     "authors": [
         {
             "name": "Alex Shelkovskiy",
             "email": "alexshelkov@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Chris Hunt",
+            "email": "chris@llamadigital.co.uk",
             "role": "Developer"
         }
     ],
