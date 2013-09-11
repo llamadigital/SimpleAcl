@@ -187,7 +187,8 @@ class Acl
      * @param string|RoleAggregateInterface $roleAggregate
      * @param string|ResourceAggregateInterface $resourceAggregate
      */
-    protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection, $roleAggregate, $resourceAggregate)
+    protected function isRuleAllow($roleName, $resourceName, $ruleName, 
+      RuleResultCollection $ruleResultCollection, $roleAggregate, $resourceAggregate)
     {
         foreach ($this->rules as $rule) {
             $rule->resetAggregate($roleAggregate, $resourceAggregate);
@@ -195,6 +196,24 @@ class Acl
             $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
             $ruleResultCollection->add($result);
         }
+
+    }
+
+    protected function addAnyRuleResultToResultSet($roleName, $resourceName,
+      $ruleResultCollection)
+    {
+      $any_resultSet = $this->matchAnyRuleResult($roleName, $resourceName);
+      $ruleResultCollection->merge($any_resultSet);
+
+      return $ruleResultCollection;
+    }
+
+    protected function matchAnyRuleResult($roleName, $resourceName)
+    {
+      $result_set = $this->isAllowedReturnResult($roleName, 
+        $resourceName, "*");
+
+      return $result_set;
     }
 
     /**
@@ -222,18 +241,27 @@ class Acl
      */
     public function isAllowedReturnResult($roleAggregate, $resourceAggregate, $ruleName)
     {
-        $ruleResultCollection = $this->getRuleResultCollection($roleAggregate);
+      $ruleResultCollection = $this->getRuleResultCollection($roleAggregate);
 
-        $roles = $this->getNames($roleAggregate);
-        $resources = $this->getNames($resourceAggregate);
+      $roles = $this->getNames($roleAggregate);
+      $resources = $this->getNames($resourceAggregate);
 
-        foreach ($roles as $roleName) {
-            foreach ($resources as $resourceName) {
-                $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection, $roleAggregate, $resourceAggregate);
-            }
+      var_dump($roles);
+      var_dump($resources);
+
+      foreach ($roles as $roleName) {
+        foreach ($resources as $resourceName) {
+          $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection, $roleAggregate, $resourceAggregate);
+
+          if($ruleName != "*") {
+            $ruleResultCollection = $this->addAnyRuleResultToResultSet(
+              $roleName, $resourceName, $ruleResultCollection);
+          }
+
         }
+      }
 
-        return $ruleResultCollection;
+      return $ruleResultCollection;
     }
 
     private function getRuleResultCollection($roleAggregate)

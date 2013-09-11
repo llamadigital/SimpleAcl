@@ -12,7 +12,7 @@ use SimpleAcl\Object;
 use SimpleAcl\Object\RecursiveIterator;
 use RecursiveIteratorIterator;
 
-class AggregateStrategyDenyWinsTest extends PHPUnit_Framework_TestCase
+class AggregateStrategyTest extends PHPUnit_Framework_TestCase
 {
   public function testDenyWins()
   {

@@ -50,6 +50,13 @@ class RuleResultCollection implements IteratorAggregate
         $this->collection->insert($result, $result->getPriority());
     }
 
+    public function merge($resultCollection)
+    {
+      foreach($resultCollection as $result) {
+        $this->add($result);
+      }
+    }
+
     /**
      * @return bool
      */
