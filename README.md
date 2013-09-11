@@ -184,4 +184,32 @@ $this->assertTrue($acl->isAllowed($all, 'SiteFrontend', 'View'));
 $this->assertFalse($acl->isAllowed($all, 'SiteBackend', 'View'));
 ```
 
+##### Using Match Any Rules
+You can add a match any rule named '*'.
+
+```php
+$acl = new Acl();
+
+$user = new Role('User');
+$admin = new Role('Admin');
+
+$strategy = new AggregateStrategyDenyWins();
+
+$all = new RoleAggregate();
+$all->setStrategy($strategy);
+$all->addRole($user);
+$all->addRole($admin);
+
+$siteFrontend = new Resource('SiteFrontend');
+$siteBackend = new Resource('SiteBackend');
+
+$acl->addRule($user, $siteFrontend, '*', true);
+$acl->addRule($admin, $siteFrontend, '*', true);
+
+$acl->addRule($admin, $siteBackend, '*', true);
+$acl->addRule($user, $siteBackend, '*', false);
+
+$this->assertTrue($acl->isAllowed($all, 'SiteFrontend', 'View'));
+$this->assertFalse($acl->isAllowed($all, 'SiteBackend', 'View'));
+```
 __For more help check out wiki pages.__

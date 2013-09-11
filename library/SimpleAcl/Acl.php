@@ -246,12 +246,10 @@ class Acl
       $roles = $this->getNames($roleAggregate);
       $resources = $this->getNames($resourceAggregate);
 
-      var_dump($roles);
-      var_dump($resources);
-
       foreach ($roles as $roleName) {
         foreach ($resources as $resourceName) {
-          $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection, $roleAggregate, $resourceAggregate);
+          $this->isRuleAllow($roleName, $resourceName, $ruleName, 
+            $ruleResultCollection, $roleAggregate, $resourceAggregate);
 
           if($ruleName != "*") {
             $ruleResultCollection = $this->addAnyRuleResultToResultSet(
