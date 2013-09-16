@@ -8,7 +8,7 @@ Add following in your composer.json:
 ```json
 {
     "require": {
-        "alexshelkov/simpleacl": "2.*"
+        "llamadigital/simpleacl": "2.*"
     }
 }
 ```
