@@ -197,4 +197,49 @@ class AggregateStrategyTest extends PHPUnit_Framework_TestCase
     $this->assertFalse($acl->isAllowed($all, 'SiteBackend', 'View'));
     $this->assertFalse($acl->isAllowed($all, 'SiteBackend', 'Hello'));
   }
+
+
+  public function testPackageExample()
+  {
+    $acl = new Acl();
+
+    $user = new Role('User');
+    $admin = new Role('Admin');
+    $bronze = new Role('Bronze');
+    $gold = new Role('Gold');
+
+    $strategy = new AggregateStrategyDenyWins();
+
+    $gold_user = new RoleAggregate();
+    $gold_user->setStrategy($strategy);
+    $gold_user->addRole($user);
+    $gold_user->addRole($gold);
+
+    $gold_admin = new RoleAggregate();
+    $gold_admin->setStrategy($strategy);
+    $gold_admin->addRole($admin);
+    $gold_admin->addRole($gold);
+
+    $bronze_user = new RoleAggregate();
+    $bronze_user->setStrategy($strategy);
+    $bronze_user->addRole($user);
+    $bronze_user->addRole($bronze);
+
+    $bronze_admin = new RoleAggregate();
+    $bronze_admin->setStrategy($strategy);
+    $bronze_admin->addRole($admin);
+    $bronze_admin->addRole($bronze);
+
+    $articles = new Resource('Articles');
+
+    $acl->addRule($user, $articles, 'edit', false);
+    $acl->addRule($admin, $articles, 'edit', true);
+    $acl->addRule($bronze, $articles, 'edit', false);
+    $acl->addRule($gold, $articles, 'edit', true);
+
+    $this->assertFalse($acl->isAllowed($gold_user, 'Articles', 'edit'));
+    $this->assertTrue($acl->isAllowed($gold_admin, 'Articles', 'edit'));
+    $this->assertFalse($acl->isAllowed($bronze_user, 'Articles', 'edit'));
+    $this->assertFalse($acl->isAllowed($bronze_admin, 'Articles', 'edit'));
+  }
 }
