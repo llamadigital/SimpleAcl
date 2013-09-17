@@ -22,6 +22,13 @@ class Rule
      */
     protected $id;
 
+	/**
+	 * Rule priority affect the order the rule is applied.
+	 *
+	 * @var int
+	 */
+	protected $priority = 0;
+
     /**
      * Hold name of rule.
      *
@@ -213,6 +220,17 @@ class Rule
         return null;
     }
 
+	/**
+	 * Check if rule can be used.
+	 *
+	 * @param $neeRuleName
+	 * @return bool
+	 */
+	protected function isRuleMatched($neeRuleName)
+	{
+		return $this->getName() == $neeRuleName;
+	}
+
     /**
      * Check owing Role & Resource (and their children) and match its with $roleName & $resourceName;
      * if match was found depending on action allow or deny access to $resourceName for $roleName.
@@ -226,7 +244,7 @@ class Rule
      */
     public function isAllowed($needRuleName, $needRoleName, $needResourceName)
     {
-        if ( $this->getName() == $needRuleName ) {
+        if ( $this->isRuleMatched($needRuleName) ) {
 	        if ( ! is_null($this->getRole()) ) {
                 $roles = new RecursiveIteratorIterator($this->getRole(), RecursiveIteratorIterator::SELF_FIRST);
 	        } else {
@@ -288,4 +306,20 @@ class Rule
     {
         return $this->resource;
     }
+
+	/**
+	 * @param int $priority
+	 */
+	public function setPriority($priority)
+	{
+		$this->priority = $priority;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getPriority()
+	{
+		return $this->priority;
+	}
 }

@@ -47,7 +47,7 @@ class RuleResultCollection implements IteratorAggregate
             return;
         }
 
-        $this->collection->insert($result, $result->getPriority());
+        $this->collection->insert($result, $result->getPriority(), $result->getRulePriority());
     }
 
     public function merge($resultCollection)
