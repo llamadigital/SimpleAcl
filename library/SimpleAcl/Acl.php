@@ -31,6 +31,13 @@ class Acl
      */
     protected $ruleClass = 'SimpleAcl\Rule';
 
+
+    /**
+     * Original design iterated over all rules for every request, this
+     * provides a quick hash cache to specific rules
+     */
+    protected $rules_cache = null;
+
     /**
      * Set rule class.
      *
@@ -57,6 +64,93 @@ class Acl
     public function getRuleClass()
     {
         return $this->ruleClass;
+    }
+
+    private function ensureRulesCache()
+    {
+      if($this->rules_cache == null) {
+        $this->updateRulesCache();
+      }
+    }
+
+    private function updateRulesCache()
+    {
+      $this->rules_cache = array();
+
+      foreach($this->rules as $rule) {
+        $this->addRuleToCache($rule);
+      }
+    }
+
+    private function addRuleToCache($rule)
+    {
+      $hash_name = $this->getRuleHash($rule);
+
+      $this->AddRuleToCacheAt($rule, $hash_name);
+    }
+
+    private function addRuleToCacheAt($rule, $hash_name)
+    {
+      if(!array_key_exists($hash_name, $this->rules_cache)) {
+        $this->rules_cache[$hash_name] = array();
+      }
+      $this->rules_cache[$hash_name][] = $rule;
+    }
+
+    /* private function updateChildrenCache($rule) */
+    /* { */
+    /*   $this->updateChildrenRoles($rule); */
+    /*   $this->updateChildrenResources($rule); */
+    /* } */
+
+    /* private function updateChildrenRoles($rule) */
+    /* { */
+    /*   $role = $rule->getRole(); */
+    /*   if(isset($role)) { */
+    /*     $child_roles = $role->getChildren(); */
+
+    /*     foreach($child_roles as $child_role) { */
+    /*       $rule_name = $rule->getName(); */
+    /*       $resource_name = $rule->getResourceName(); */
+    /*       $role_name = $child_role->getName(); */
+
+    /*       $hash_name = */ 
+    /*         $this->getRuleHashFromNames($rule_name, $resource_name, $role_name); */
+    /*       $this->addRuleToCacheAt($rule, $hash_name); */
+    /*     } */
+    /*   } */
+    /* } */
+
+    /* private function updateChildrenResources($rule) */
+    /* { */
+    /*   $resource = $rule->getResource(); */
+    /*   if(isset($resource)) { */
+    /*     $child_resources = $resource->getChildren(); */
+
+    /*     foreach($child_resources as $child_resource) { */
+    /*       $rule_name = $rule->getName(); */
+    /*       $resource_name = $child_resource->getName(); */
+    /*       $role_name = $rule->getRoleName(); */
+
+    /*       $hash_name = */ 
+    /*         $this->getRuleHashFromNames($rule_name, $resource_name, $role_name); */
+    /*       $this->addRuleToCacheAt($rule, $hash_name); */
+    /*     } */
+    /*   } */
+    /* } */
+
+    private function getRuleHash($rule)
+    {
+      $rule_name = $rule->getName();
+      $resource_name = $rule->getResourceName();
+      $role_name = $rule->getRoleName();
+
+      return $this->getRuleHashFromNames($rule_name, $resource_name, $role_name);
+    }
+
+    private function getRuleHashFromNames($rule_name, $resource_name, $role_name)
+    {
+      return $rule_name . $resource_name . $role_name;
     }
 
     /**
@@ -176,6 +270,19 @@ class Acl
         return array();
     }
 
+    private function getMatchingRulesFromCache($rule_name, $resource_name, 
+      $role_name)
+    {
+      $rules = array();
+      $hash = $this->getRuleHashFromNames($rule_name, $resource_name, $role_name);
+
+      if(array_key_exists($hash, $this->rules_cache)) {
+        $rules = array_merge($rules, $this->rules_cache[$hash]);
+      }
+
+      return $rules;
+    }
+
     /**
      * Check is access allowed by some rule.
      * Returns null if rule don't match any role or resource.
@@ -190,7 +297,11 @@ class Acl
     protected function isRuleAllow($roleName, $resourceName, $ruleName, 
       RuleResultCollection $ruleResultCollection, $roleAggregate, $resourceAggregate)
     {
-        foreach ($this->rules as $rule) {
+        $this->ensureRulesCache();
+        $rules = $this->getMatchingRulesFromCache($ruleName, $resourceName,
+          $roleName);
+
+        foreach ($rules as $rule) {
             $rule->resetAggregate($roleAggregate, $resourceAggregate);
 
             $result = $rule->isAllowed($ruleName, $roleName, $resourceName);

@@ -273,6 +273,18 @@ class Rule
         return $this->role;
     }
 
+    public function getRoleName()
+    {
+      $role_name = '';
+      $role = $this->getRole();
+
+      if(isset($role)) {
+        $role_name = $role->getName();
+      }
+
+      return $role_name;
+    }
+
     /**
      * @param Resource|null $resource
      */
@@ -287,5 +299,17 @@ class Rule
     public function getResource()
     {
         return $this->resource;
+    }
+
+    public function getResourceName()
+    {
+      $resource_name = '';
+      $resource = $this->getResource();
+
+      if(isset($resource)) {
+        $resource_name = $resource->getName();
+      }
+
+      return $resource_name;
     }
 }

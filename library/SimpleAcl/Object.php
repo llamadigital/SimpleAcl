@@ -58,19 +58,6 @@ abstract class Object implements IteratorAggregate
     }
 
     /**
-     * Adds child if it not added.
-     *
-     * @param Object $child
-     */
-    public function addChild(Object $child)
-    {
-        if ( $this->hasChild($child) ) {
-            return;
-        }
-        $this->children[] = $child;
-    }
-
-    /**
      * Remove child, return true if child was removed.
      *
      * @param Object|string $needChild
